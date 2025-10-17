@@ -5,7 +5,7 @@ namespace AdventOfCode2021_Day25.Tests
     public class ProgramTests
     {
         [Fact]
-        public void Test1()
+        public void ExampleInput_ReturnsCorrectSteps()
         {
             //Arrange
             string[] example = File.ReadAllLines("TestInput.txt");
@@ -19,7 +19,7 @@ namespace AdventOfCode2021_Day25.Tests
         }
 
         [Fact]
-        public void VerifyGrid()
+        public void ExampleInput_ReturnsCorrectGrid()
         {
             //Arrange
             string[] example = File.ReadAllLines("TestInput.txt");
