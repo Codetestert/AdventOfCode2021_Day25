@@ -19,9 +19,7 @@ namespace AdventOfCode2021_Day25
         }
 
         public static int CalculateSteps(char[,] grid)
-        {
-            int rows = grid.GetLength(0);
-            int cols = grid.GetLength(1);
+        {           
             int steps = 0;
 
             while (true)
@@ -29,54 +27,68 @@ namespace AdventOfCode2021_Day25
                 steps++;
                 bool movedAny = false;
 
-                //East moves
-                var newGrid = (char[,])grid.Clone();
+                char[,] newGrid = EastMoves(grid, ref movedAny);
 
-                for (int r = 0; r < rows; r++)
-                {
-                    for (int c = 0; c < cols; c++)
-                    {
-                        if (grid[r, c] == '>')
-                        {
-                            int c2 = (c + 1) % cols;
-                            if (grid[r, c2] == '.')
-                            {
-                                newGrid[r, c] = '.';
-                                newGrid[r, c2] = '>';
-                                movedAny = true;
-                            }
-                        }
-                    }
-                }
-
-                //South moves
-                var afterSouth = (char[,])newGrid.Clone();
-                for (int r = 0; r < rows; r++)
-                {
-                    for (int c = 0; c < cols; c++)
-                    {
-                        if (newGrid[r, c] == 'v')
-                        {
-                            int r2 = (r + 1) % rows;
-                            if (newGrid[r2, c] == '.')
-                            {
-                                afterSouth[r, c] = '.';
-                                afterSouth[r2, c] = 'v';
-                                movedAny = true;
-                            }
-                        }
-                    }
-                }
+                grid = SouthMoves(newGrid, ref movedAny );
 
                 //If no moves happened in either phase, stop
                 if (!movedAny)
                 {
                     return steps;
                 }
-
-                //Next round
-                grid = afterSouth;
             }
+        }
+
+        public static char[,] EastMoves(char[,] grid, ref bool movedAny)
+        {
+            var newGrid = (char[,])grid.Clone();
+            int rows = grid.GetLength(0);
+            int columns = grid.GetLength(1);
+
+            for (int row = 0; row < rows; row++)
+            {
+                for (int column = 0; column < columns; column++)
+                {
+                    if (grid[row, column] == '>')
+                    {
+                        int nextColumn = (column + 1) % columns;
+                        if (grid[row, nextColumn] == '.')
+                        {
+                            newGrid[row, column] = '.';
+                            newGrid[row, nextColumn] = '>';
+                            movedAny = true;
+                        }
+                    }
+                }
+            }
+
+            return newGrid;
+        }
+
+        public static char[,] SouthMoves(char[,] grid, ref bool movedAny)
+        {
+            var newGrid = (char[,])grid.Clone();
+            int rows = grid.GetLength(0);
+            int columns = grid.GetLength(1);
+
+            for (int row = 0; row < rows; row++)
+            {
+                for (int column = 0; column < columns; column++)
+                {
+                    if (grid[row, column] == 'v')
+                    {
+                        int nextRow = (row + 1) % rows;
+                        if (grid[nextRow, column] == '.')
+                        {
+                            newGrid[row, column] = '.';
+                            newGrid[nextRow, column] = 'v';
+                            movedAny = true;
+                        }
+                    }
+                }
+            }
+
+            return newGrid;
         }
 
         public static char[,] MakeGrid(string[] lines)
