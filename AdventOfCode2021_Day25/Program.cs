@@ -10,7 +10,7 @@ namespace AdventOfCode2021_Day25
             //read whole file
             //for every ">" check if the next character is "." then change
             //for every "v" check if the character below it is "." then change
-            //make the field wrap, so line[line.length] checks line[0] and lines[lines.length] checks lines[0] but relative position line[i]           
+            //make the field wrap, so line[max] checks line[0] and lines[max] checks lines[0] but relative position line[i]           
 
             var lines = File.ReadAllLines("Input.txt");
             var grid = MakeGrid(lines);
@@ -19,19 +19,16 @@ namespace AdventOfCode2021_Day25
         }
 
         public static int CalculateSteps(char[,] grid)
-        {           
+        {
             int steps = 0;
 
             while (true)
             {
                 steps++;
                 bool movedAny = false;
-
                 char[,] newGrid = EastMoves(grid, ref movedAny);
+                grid = SouthMoves(newGrid, ref movedAny);
 
-                grid = SouthMoves(newGrid, ref movedAny );
-
-                //If no moves happened in either phase, stop
                 if (!movedAny)
                 {
                     return steps;
@@ -39,7 +36,7 @@ namespace AdventOfCode2021_Day25
             }
         }
 
-        public static char[,] EastMoves(char[,] grid, ref bool movedAny)
+        public static char[,] Move(char[,] grid, ref bool movedAny, char symbol, int rowDelta, int columnDelta)
         {
             var newGrid = (char[,])grid.Clone();
             int rows = grid.GetLength(0);
@@ -49,13 +46,15 @@ namespace AdventOfCode2021_Day25
             {
                 for (int column = 0; column < columns; column++)
                 {
-                    if (grid[row, column] == '>')
+                    if (grid[row, column] == symbol)
                     {
-                        int nextColumn = (column + 1) % columns;
-                        if (grid[row, nextColumn] == '.')
+                        int newRow = (row + rowDelta + rows) % rows;
+                        int newColumn = (column + columnDelta + columns) % columns;
+
+                        if (grid[newRow, newColumn] == '.')
                         {
                             newGrid[row, column] = '.';
-                            newGrid[row, nextColumn] = '>';
+                            newGrid[newRow, newColumn] = symbol;
                             movedAny = true;
                         }
                     }
@@ -64,32 +63,12 @@ namespace AdventOfCode2021_Day25
 
             return newGrid;
         }
+
+        public static char[,] EastMoves(char[,] grid, ref bool movedAny)
+            => Move(grid, ref movedAny, '>', 0, 1);
 
         public static char[,] SouthMoves(char[,] grid, ref bool movedAny)
-        {
-            var newGrid = (char[,])grid.Clone();
-            int rows = grid.GetLength(0);
-            int columns = grid.GetLength(1);
-
-            for (int row = 0; row < rows; row++)
-            {
-                for (int column = 0; column < columns; column++)
-                {
-                    if (grid[row, column] == 'v')
-                    {
-                        int nextRow = (row + 1) % rows;
-                        if (grid[nextRow, column] == '.')
-                        {
-                            newGrid[row, column] = '.';
-                            newGrid[nextRow, column] = 'v';
-                            movedAny = true;
-                        }
-                    }
-                }
-            }
-
-            return newGrid;
-        }
+            => Move(grid, ref movedAny, 'v', 1, 0);
 
         public static char[,] MakeGrid(string[] lines)
         {
